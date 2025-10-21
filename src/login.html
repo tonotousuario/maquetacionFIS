@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayEasy - Iniciar Sesión</title>
+    <!-- Carga de Tailwind CSS para un diseño moderno y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Fuente Inter para un aspecto limpio y profesional */
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6; /* Fondo gris claro */
+      }
+      /* Color de acento de StayEasy (un verde azulado profesional) */
+      .accent-color {
+        color: #0d9488; /* teal-600 */
+      }
+      .accent-bg {
+        background-color: #0d9488; /* teal-600 */
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen p-4">
+    <!-- Contenedor Principal de la Tarjeta de Login -->
+    <div class="w-full max-w-sm">
+      <div
+        class="bg-white p-8 rounded-2xl shadow-2xl transition-all duration-300 hover:shadow-3xl"
+      >
+        <!-- Encabezado y Marca (StayEasy) -->
+        <div class="text-center mb-8">
+          <!-- LOGO PLACEHOLDER: Reemplazado el SVG por un placeholder de imagen -->
+          <img
+            src="https://placehold.co/48x48/0d9488/ffffff?text=LOGO"
+            alt="Logo de StayEasy"
+            class="w-12 h-12 inline-block rounded-lg mb-3"
+            onerror="this.onerror=null; this.src='https://placehold.co/48x48/999999/ffffff?text=LOGO'"
+          />
+          <h1 class="text-3xl font-extrabold text-gray-900 accent-color">
+            StayEasy
+          </h1>
+          <p class="text-sm text-gray-500 mt-1">Gestión Hotelera Profesional</p>
+        </div>
+
+        <!-- Formulario de Ingreso -->
+        <form action="#" method="POST" class="space-y-6">
+          <!-- Campo de Usuario -->
+          <div>
+            <label
+              for="usuario"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Usuario o Email
+            </label>
+            <div class="mt-1">
+              <input
+                id="usuario"
+                name="usuario"
+                type="email"
+                autocomplete="username"
+                required
+                placeholder="ej. tu.nombre@hotel.com"
+                class="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-600 sm:text-base transition duration-150 ease-in-out"
+              />
+            </div>
+          </div>
+
+          <!-- Campo de Contraseña -->
+          <div>
+            <label
+              for="contrasena"
+              class="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Contraseña
+            </label>
+            <div class="mt-1">
+              <input
+                id="contrasena"
+                name="contrasena"
+                type="password"
+                autocomplete="current-password"
+                required
+                placeholder="••••••••"
+                class="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-600 sm:text-base transition duration-150 ease-in-out"
+              />
+            </div>
+          </div>
+
+          <!-- Opción de Recordarme / Olvidé mi Contraseña (opcional, para completar la interfaz) -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input
+                id="remember-me"
+                name="remember-me"
+                type="checkbox"
+                class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+              />
+              <label for="remember-me" class="ml-2 block text-sm text-gray-900">
+                Recordarme
+              </label>
+            </div>
+            <div class="text-sm">
+              <a
+                href="#"
+                class="font-medium accent-color hover:text-teal-700 transition duration-150 ease-in-out"
+              >
+                ¿Olvidaste tu contraseña?
+              </a>
+            </div>
+          </div>
+
+          <!-- Botón de Ingresar -->
+          <div>
+            <button
+              type="submit"
+              class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-lg font-semibold text-white accent-bg hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-600 transition duration-150 ease-in-out transform hover:scale-[1.01] active:scale-[0.98]"
+            >
+              Ingresar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayEasy - Check-in Rápido</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Fuente Inter y fondo suave */
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6; /* Fondo gris claro */
+      }
+      /* Color de acento de StayEasy (teal-600) */
+      .accent-color {
+        color: #0d9488;
+      }
+      .accent-bg {
+        background-color: #0d9488;
+      }
+      /* Estilo para campos de solo lectura */
+      .readonly-field {
+        background-color: #f9fafb;
+        border-left: 4px solid #bae6fd; /* Azul claro para diferenciar de campos activos */
+        color: #1f2937;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body
+    class="flex items-start justify-center min-h-screen p-4 sm:p-8 antialiased"
+  >
+    <!-- Tarjeta Principal del Formulario -->
+    <div class="w-full max-w-4xl">
+      <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-10">
+        <!-- Encabezado y Título -->
+        <div class="mb-8 border-b pb-4">
+          <div class="flex items-center justify-between">
+            <h1 class="text-3xl font-extrabold text-gray-900 accent-color">
+              Check-in de Huésped
+            </h1>
+            <span
+              class="text-sm font-semibold text-teal-600 bg-teal-100 px-3 py-1 rounded-full"
+            >
+              Reserva #SE-3904
+            </span>
+          </div>
+          <p class="text-gray-500 mt-1">
+            Confirmación de identidad, asignación de habitación y entrega de
+            llave.
+          </p>
+        </div>
+
+        <!-- MOCK DATA: Simulación de datos de reserva cargados -->
+        <script>
+          const mockReservation = {
+            guestName: "Ana María Torres",
+            roomNumber: "405",
+            roomType: "Suite Ejecutiva",
+            checkIn: "2025-09-29",
+            checkOut: "2025-10-03",
+            nights: 4,
+            totalPending: 280.0,
+            idVerified: false,
+            keyAssigned: "",
+          };
+        </script>
+
+        <form id="checkin-form" class="space-y-8">
+          <!-- SECCIÓN 1: DETALLES DE LA RESERVA (Solo Lectura) -->
+          <h2 class="text-xl font-semibold text-gray-800">
+            1. Detalles de la Reserva
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Campo Nombre del Huésped -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Huésped Principal</label
+              >
+              <input
+                type="text"
+                value="Ana María Torres"
+                readonly
+                class="mt-1 block w-full px-3 py-2 border rounded-lg readonly-field"
+              />
+            </div>
+
+            <!-- Campo Habitación Asignada -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Habitación Asignada</label
+              >
+              <input
+                type="text"
+                value="405 - Suite Ejecutiva"
+                readonly
+                class="mt-1 block w-full px-3 py-2 border rounded-lg readonly-field bg-yellow-50 text-yellow-800 border-yellow-300"
+              />
+            </div>
+
+            <!-- Campo Fechas -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700"
+                >Estadía</label
+              >
+              <input
+                type="text"
+                value="29/Sep al 03/Oct (4 Noches)"
+                readonly
+                class="mt-1 block w-full px-3 py-2 border rounded-lg readonly-field"
+              />
+            </div>
+
+            <!-- Tarjeta de Pago Pendiente -->
+            <div
+              class="md:col-span-3 bg-red-50 p-4 rounded-lg flex justify-between items-center border border-red-200"
+            >
+              <p class="text-sm font-medium text-red-700">
+                &#9888; Saldo Pendiente de Pago:
+                <span class="text-lg font-bold ml-2">$280.00</span> USD
+              </p>
+              <button
+                type="button"
+                class="bg-red-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-700 transition"
+              >
+                Procesar Pago
+              </button>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 2: CONFIRMACIÓN Y ASIGNACIÓN -->
+          <div class="pt-6 border-t">
+            <h2 class="text-xl font-semibold text-gray-800">
+              2. Proceso de Recepción
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Columna 1: Verificación de Identidad -->
+            <div
+              class="md:col-span-1 space-y-4 p-4 border rounded-lg shadow-sm"
+            >
+              <h3 class="font-bold text-gray-700">Verificación Documental</h3>
+
+              <div class="flex items-center">
+                <input
+                  id="id-verification"
+                  type="checkbox"
+                  required
+                  class="h-5 w-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+                />
+                <label
+                  for="id-verification"
+                  class="ml-3 block text-base font-medium text-gray-900"
+                >
+                  Documento de Identidad (ID) verificado.
+                </label>
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  id="signature-confirmed"
+                  type="checkbox"
+                  required
+                  class="h-5 w-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+                />
+                <label
+                  for="signature-confirmed"
+                  class="ml-3 block text-base font-medium text-gray-900"
+                >
+                  Ficha de Registro firmada.
+                </label>
+              </div>
+            </div>
+
+            <!-- Columna 2: Asignación de Llave y Wi-Fi -->
+            <div
+              class="md:col-span-2 space-y-4 p-4 border rounded-lg shadow-sm"
+            >
+              <h3 class="font-bold text-gray-700">Asignación de Recursos</h3>
+
+              <!-- Campo Número de Tarjeta/Llave -->
+              <div>
+                <label
+                  for="key-card-number"
+                  class="block text-sm font-medium text-gray-700"
+                >
+                  Número de Tarjeta/Llave
+                </label>
+                <input
+                  type="text"
+                  id="key-card-number"
+                  placeholder="Ej. 1A2B-405"
+                  required
+                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500"
+                />
+              </div>
+
+              <!-- Información de Wi-Fi (Simulación de impresión) -->
+              <div
+                class="bg-gray-50 p-3 rounded-lg border-dashed border-2 border-gray-200"
+              >
+                <p class="text-sm font-medium text-gray-700">Wi-Fi:</p>
+                <p class="text-xs text-gray-500">
+                  Red: StayEasyGuest | Clave: Welcome2025
+                </p>
+                <button
+                  type="button"
+                  class="mt-2 text-xs text-blue-600 hover:text-blue-800"
+                >
+                  Imprimir Tarjeta de Wi-Fi
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN 3: FINALIZAR CHECK-IN -->
+          <div class="pt-6 border-t flex justify-end">
+            <button
+              type="submit"
+              id="finalize-button"
+              class="flex items-center justify-center py-3 px-8 border border-transparent rounded-lg shadow-lg text-lg font-semibold text-white accent-bg hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-teal-300 transition duration-150 ease-in-out disabled:opacity-50"
+              disabled
+            >
+              Finalizar Check-in y Abrir Factura
+              <span class="ml-2">&#10003;</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- LÓGICA JAVASCRIPT para habilitar el botón -->
+    <script>
+      const form = document.getElementById("checkin-form");
+      const idVerification = document.getElementById("id-verification");
+      const signatureConfirmed = document.getElementById("signature-confirmed");
+      const keyCardNumber = document.getElementById("key-card-number");
+      const finalizeButton = document.getElementById("finalize-button");
+
+      function checkFormValidity() {
+        // Habilita el botón solo si todos los campos requeridos están llenos y confirmados
+        const isReady =
+          idVerification.checked &&
+          signatureConfirmed.checked &&
+          keyCardNumber.value.trim() !== "";
+
+        finalizeButton.disabled = !isReady;
+      }
+
+      // Añadir listeners para verificar el estado
+      idVerification.addEventListener("change", checkFormValidity);
+      signatureConfirmed.addEventListener("change", checkFormValidity);
+      keyCardNumber.addEventListener("input", checkFormValidity);
+
+      // Manejo del formulario (solo simulación)
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        if (finalizeButton.disabled) {
+          // Esto no debería suceder si la lógica es correcta, pero es una buena práctica
+          console.warn("El formulario no está completo.");
+          return;
+        }
+
+        // Simulación de Check-in exitoso
+        finalizeButton.textContent = "Check-in Exitoso!";
+        finalizeButton.classList.remove("accent-bg", "hover:bg-teal-700");
+        finalizeButton.classList.add("bg-green-600", "hover:bg-green-700");
+
+        // En una aplicación real, aquí se enviarían los datos y se redirigiría al resumen de factura.
+        setTimeout(() => {
+          alert("¡Check-in de Ana María Torres completado con éxito!");
+          // Resetear el estado de la UI para un nuevo check-in
+          finalizeButton.textContent = "Finalizar Check-in y Abrir Factura";
+          finalizeButton.classList.remove("bg-green-600", "hover:bg-green-700");
+          finalizeButton.classList.add("accent-bg", "hover:bg-teal-700");
+          form.reset();
+          finalizeButton.disabled = true;
+          // Nota: Usé alert() solo para simular el mensaje final. En la práctica, se usaría un modal.
+        }, 1000);
+      });
+
+      // Ejecutar la verificación inicial
+      window.onload = checkFormValidity;
+    </script>
+  </body>
+</html>

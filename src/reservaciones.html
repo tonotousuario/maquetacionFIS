@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayEasy - Reservaciones</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Fuente Inter y fondo suave */
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f7f7f7;
+      }
+      /* Color de acento de StayEasy (teal-600) */
+      .accent-color {
+        color: #0d9488;
+      }
+      .accent-bg {
+        background-color: #0d9488;
+      }
+
+      /* Estilos específicos del planificador */
+      #reservations-grid {
+        /* Permite el scroll horizontal si la tabla es más ancha */
+        overflow-x: auto;
+        max-width: 100%;
+        border-radius: 0.75rem;
+      }
+      .room-row {
+        display: flex;
+        min-height: 3rem; /* Altura de la fila */
+      }
+      .room-header {
+        min-width: 6rem; /* Ancho fijo para el nombre de la habitación */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        position: sticky; /* Fija la columna de la habitación para el scroll */
+        left: 0;
+        z-index: 10;
+        background-color: #f3f4f6; /* Fondo distinto para la cabecera */
+        border-right: 1px solid #e5e7eb;
+      }
+      .date-cell {
+        min-width: 6rem; /* Ancho de la celda de fecha */
+        flex-grow: 1;
+        border-right: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5e7eb;
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: background-color 0.15s;
+        position: relative;
+      }
+      .date-cell:hover {
+        background-color: #e5e7eb; /* Gris claro al pasar el ratón */
+        z-index: 5; /* Asegura que el hover se vea sobre otras celdas */
+      }
+      .today-header {
+        background-color: #f0fdf4; /* Fondo verde claro para hoy */
+        color: #15803d; /* Texto verde oscuro */
+        border-bottom: 2px solid #10b981;
+      }
+      .today-cell {
+        background-color: #f0fdf4 !important; /* Resaltar la celda de hoy */
+      }
+
+      /* Estilos para barras de reserva */
+      .reservation-bar {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 80%;
+        border-radius: 0.375rem; /* rounded-md */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        color: white;
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        padding: 0 0.5rem;
+        z-index: 10; /* Asegura que esté sobre el fondo de la celda */
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body class="antialiased">
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR (Reutilizando la estructura del Dashboard) -->
+    <header class="bg-white shadow-sm sticky top-0 z-20">
+      <div
+        class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center"
+      >
+        <div class="flex items-center">
+          <img
+            src="https://placehold.co/32x32/0d9488/ffffff?text=L"
+            alt="Logo de StayEasy"
+            class="w-8 h-8 rounded-md mr-3"
+          />
+          <h1 class="text-xl font-bold text-gray-900 accent-color">StayEasy</h1>
+        </div>
+        <span class="text-lg font-semibold text-gray-700 hidden sm:block"
+          >Planificador de Reservaciones</span
+        >
+        <div class="flex items-center space-x-4">
+          <button
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition duration-150 shadow-md flex items-center"
+          >
+            &#43; Nueva Reserva
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL: PLANIFICADOR -->
+    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold leading-tight text-gray-900 mb-6">
+        Disponibilidad Semanal
+      </h2>
+
+      <!-- Controles de Vista (Simulación) -->
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex space-x-2">
+          <button
+            class="bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-100 transition duration-150 text-sm"
+          >
+            &#9664; Anterior
+          </button>
+          <button
+            class="bg-white border border-gray-300 text-gray-700 px-3 py-1 rounded-lg hover:bg-gray-100 transition duration-150 text-sm"
+          >
+            Siguiente &#9654;
+          </button>
+        </div>
+        <span
+          id="current-period"
+          class="font-medium text-lg text-gray-700"
+        ></span>
+      </div>
+
+      <!-- REJILLA DEL PLANIFICADOR DE RESERVAS -->
+      <div id="reservations-grid" class="bg-white shadow-xl">
+        <!-- El contenido de la tabla será generado por JavaScript -->
+        <div id="calendar-container"></div>
+      </div>
+    </main>
+
+    <!-- MODAL PARA NUEVA RESERVA (OCULTO POR DEFECTO) -->
+    <div
+      id="reservation-modal"
+      class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden flex items-center justify-center p-4"
+      onclick="closeModal(event)"
+    >
+      <div
+        class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg transform transition-all duration-300"
+        onclick="event.stopPropagation()"
+      >
+        <div class="flex justify-between items-center mb-4 border-b pb-2">
+          <h3 class="text-2xl font-bold accent-color" id="modal-title">
+            Nueva Reserva
+          </h3>
+          <button
+            onclick="closeModal()"
+            class="text-gray-400 hover:text-gray-600"
+          >
+            &times;
+          </button>
+        </div>
+        <form id="reservation-form" class="space-y-4">
+          <p
+            id="selected-date-info"
+            class="text-sm font-medium text-gray-600 bg-teal-50 p-3 rounded-lg"
+          ></p>
+
+          <div>
+            <label
+              for="guest-name"
+              class="block text-sm font-medium text-gray-700"
+              >Nombre del Huésped</label
+            >
+            <input
+              type="text"
+              id="guest-name"
+              placeholder="Ej. Juan Pérez"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500"
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                for="check-in"
+                class="block text-sm font-medium text-gray-700"
+                >Check-in</label
+              >
+              <input
+                type="date"
+                id="check-in"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500"
+              />
+            </div>
+            <div>
+              <label
+                for="check-out"
+                class="block text-sm font-medium text-gray-700"
+                >Check-out</label
+              >
+              <input
+                type="date"
+                id="check-out"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="status" class="block text-sm font-medium text-gray-700"
+              >Estado</label
+            >
+            <select
+              id="status"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500"
+            >
+              <option value="RESERVADA">Reservada</option>
+              <option value="CHECKED_IN">Check-in</option>
+              <option value="TENTATIVA">Tentativa</option>
+            </select>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button
+              type="button"
+              onclick="closeModal()"
+              class="mr-3 py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition duration-150"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="accent-bg text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-teal-700 transition duration-150"
+            >
+              Guardar Reserva
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- LÓGICA JAVASCRIPT -->
+    <script>
+      // CONFIGURACIÓN Y MOCK DATA
+      const calendarContainer = document.getElementById("calendar-container");
+      const modal = document.getElementById("reservation-modal");
+      const selectedDateInfo = document.getElementById("selected-date-info");
+      const currentPeriodSpan = document.getElementById("current-period");
+
+      // Datos de Mock (Habitaciones)
+      const MOCK_ROOMS = [
+        { id: "101", name: "101 - Doble" },
+        { id: "102", name: "102 - Doble" },
+        { id: "201", name: "201 - King" },
+        { id: "202", name: "202 - King" },
+        { id: "301", name: "301 - Suite" },
+        { id: "302", name: "302 - Suite" },
+        { id: "401", name: "401 - Out" },
+        { id: "402", name: "402 - Doble" },
+        { id: "501", name: "501 - King" },
+        { id: "502", name: "502 - King" },
+      ];
+
+      // Definición de Estados y Colores
+      const STATUS_MAP = {
+        RESERVADA: { color: "bg-blue-500", text: "Res." },
+        CHECKED_IN: { color: "bg-teal-600", text: "In" },
+        SALIDA_HOY: { color: "bg-yellow-500", text: "Out" },
+        NO_DISPONIBLE: { color: "bg-red-500", text: "Mnt." },
+        TENTATIVA: { color: "bg-purple-400", text: "Ten." },
+      };
+
+      // Mock de Reservaciones (Fechas relativas para la demostración)
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      const nextWeek = new Date(today);
+      nextWeek.setDate(today.getDate() + 7);
+
+      const MOCK_RESERVATIONS = [
+        {
+          id: 1,
+          room_id: "101",
+          start: tomorrow,
+          end: nextWeek,
+          status: "RESERVADA",
+          guest: "Pérez",
+        },
+        {
+          id: 2,
+          room_id: "202",
+          start: today,
+          end: tomorrow,
+          status: "CHECKED_IN",
+          guest: "López",
+        },
+        {
+          id: 3,
+          room_id: "301",
+          start: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000),
+          end: tomorrow,
+          status: "SALIDA_HOY",
+          guest: "Gómez",
+        },
+        {
+          id: 4,
+          room_id: "401",
+          start: new Date(today.getTime() - 5 * 24 * 60 * 60 * 1000),
+          end: nextWeek,
+          status: "NO_DISPONIBLE",
+          guest: "Mantenimiento",
+        },
+      ];
+
+      // UTILIDADES DE FECHA
+      const dateFormatter = new Intl.DateTimeFormat("es-MX", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      });
+      const dayOnlyFormatter = new Intl.DateTimeFormat("es-MX", {
+        day: "numeric",
+      });
+
+      function getStartOfWeek(date) {
+        const d = new Date(date);
+        const day = d.getDay(); // 0 (Domingo) - 6 (Sábado)
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Ajusta para empezar en Lunes (1)
+        const startOfWeek = new Date(d.setDate(diff));
+        startOfWeek.setHours(0, 0, 0, 0);
+        return startOfWeek;
+      }
+
+      function dateToYMD(date) {
+        return (
+          date.getFullYear() +
+          "-" +
+          (date.getMonth() + 1).toString().padStart(2, "0") +
+          "-" +
+          date.getDate().toString().padStart(2, "0")
+        );
+      }
+
+      // CÁLCULO DE RESERVAS
+      function calculateReservationPosition(
+        startDate,
+        endDate,
+        calendarStart,
+        calendarEnd,
+      ) {
+        const start = startDate.setHours(0, 0, 0, 0);
+        const end = endDate.setHours(0, 0, 0, 0);
+        const calStart = calendarStart.setHours(0, 0, 0, 0);
+        const calEnd = calendarEnd.setHours(0, 0, 0, 0);
+
+        // Determinar si la reserva está dentro del rango visible
+        if (end <= calStart || start >= calEnd) {
+          return null;
+        }
+
+        // Calcular el número total de días en la vista (7 días)
+        const totalDays = 7;
+        const msInDay = 24 * 60 * 60 * 1000;
+
+        // Días que la reserva dura dentro de la vista
+        const visibleStart = new Date(Math.max(start, calStart));
+        const visibleEnd = new Date(Math.min(end, calEnd - msInDay)); // Excluye el día de salida (check-out)
+
+        const startDayIndex = (visibleStart - calStart) / msInDay;
+        const visibleDuration = (visibleEnd - visibleStart) / msInDay + 1; // +1 porque es inclusivo
+
+        const left = (startDayIndex / totalDays) * 100;
+        const width = (visibleDuration / totalDays) * 100;
+
+        return { left: `${left}%`, width: `${width}%` };
+      }
+
+      // FUNCIÓN PRINCIPAL DE RENDERIZADO
+      function renderCalendar(referenceDate = new Date()) {
+        calendarContainer.innerHTML = "";
+
+        // 1. Definir el rango semanal (Lunes a Domingo)
+        const weekStart = getStartOfWeek(referenceDate);
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekStart.getDate() + 7); // Excluye el octavo día
+
+        const days = [];
+        let currentDay = new Date(weekStart);
+        while (currentDay < weekEnd) {
+          days.push(new Date(currentDay));
+          currentDay.setDate(currentDay.getDate() + 1);
+        }
+
+        // Actualizar el periodo mostrado
+        const monthFormatter = new Intl.DateTimeFormat("es-MX", {
+          month: "long",
+          year: "numeric",
+        });
+        currentPeriodSpan.textContent = `${dayOnlyFormatter.format(weekStart)} - ${dayOnlyFormatter.format(new Date(weekEnd.getTime() - 24 * 60 * 60 * 1000))} de ${monthFormatter.format(weekStart)}`;
+
+        // 2. Crear la fila de cabecera de las fechas
+        let headerRowHTML =
+          '<div class="room-row bg-white font-semibold text-gray-700 border-b">';
+        headerRowHTML +=
+          '<div class="room-header text-xs sm:text-sm h-12">Habitación</div>';
+
+        const todayYMD = dateToYMD(today);
+
+        days.forEach((day) => {
+          const dayYMD = dateToYMD(day);
+          const isToday = dayYMD === todayYMD;
+          const headerClass = isToday ? "today-header" : "bg-white";
+
+          headerRowHTML += `<div class="date-cell flex flex-col justify-center items-center h-12 ${headerClass} p-1 text-xs">
+                    <span class="font-bold">${dayOnlyFormatter.format(day)}</span>
+                    <span class="uppercase text-gray-500">${dateFormatter.format(day).split(",")[0]}</span>
+                </div>`;
+        });
+        headerRowHTML += "</div>";
+        calendarContainer.innerHTML += headerRowHTML;
+
+        // 3. Crear las filas de habitaciones
+        MOCK_ROOMS.forEach((room) => {
+          let roomRowHTML = `<div class="room-row relative">`;
+
+          // Cabecera de la Habitación
+          roomRowHTML += `<div class="room-header text-sm text-gray-800">${room.name}</div>`;
+
+          // Celdas de Fecha
+          days.forEach((day) => {
+            const dayYMD = dateToYMD(day);
+            const isToday = dayYMD === todayYMD;
+            const cellClass = isToday ? "today-cell" : "bg-white";
+
+            // Atributos de datos para el clic
+            roomRowHTML += `<div 
+                        class="date-cell ${cellClass}" 
+                        data-room-id="${room.id}" 
+                        data-date="${dayYMD}"
+                        onclick="openModal('${room.name}', '${dateFormatter.format(day)}')"
+                    ></div>`;
+          });
+
+          roomRowHTML += "</div>"; // Fin de room-row
+          calendarContainer.innerHTML += roomRowHTML;
+
+          // 4. Agregar barras de reserva
+          MOCK_RESERVATIONS.filter((res) => res.room_id === room.id).forEach(
+            (res) => {
+              const pos = calculateReservationPosition(
+                res.start,
+                res.end,
+                weekStart,
+                weekEnd,
+              );
+              if (pos) {
+                const statusData = STATUS_MAP[res.status];
+                const rowElement = calendarContainer.lastElementChild;
+
+                const reservationBar = document.createElement("div");
+                reservationBar.className = `reservation-bar ${statusData.color} cursor-pointer hover:shadow-lg`;
+                reservationBar.style.left = pos.left;
+                reservationBar.style.width = pos.width;
+                reservationBar.innerHTML = `<span class="truncate">${statusData.text}: ${res.guest}</span>`;
+                reservationBar.title = `Reserva de ${res.guest} (${res.status})`;
+
+                // Añadir la barra a la fila
+                rowElement.appendChild(reservationBar);
+              }
+            },
+          );
+        });
+      }
+
+      // Funciones del Modal
+      function openModal(roomName, formattedDate) {
+        selectedDateInfo.textContent = `Creando reserva en: ${roomName} | Fecha Seleccionada: ${formattedDate}`;
+        // Pre-rellenar el check-in del formulario con la fecha seleccionada
+        const dateParts = formattedDate.split(" ")[2].split("/"); // Ejemplo: "lun, 25/sep"
+        const year = today.getFullYear(); // Usar el año actual para la maqueta
+        const yyyyMmDd = `${year}-${dateParts[1].padStart(2, "0")}-${dateParts[0].padStart(2, "0")}`;
+        document.getElementById("check-in").value = yyyyMmDd;
+
+        modal.classList.remove("hidden");
+      }
+
+      function closeModal(event) {
+        // Cierra el modal solo si el clic fue en el fondo o en el botón de cerrar
+        if (
+          !event ||
+          event.target === modal ||
+          event.target.tagName === "BUTTON" ||
+          event.target.textContent === "×"
+        ) {
+          modal.classList.add("hidden");
+          // Opcional: limpiar el formulario
+          document.getElementById("reservation-form").reset();
+        }
+      }
+
+      // Manejo del formulario (solo mock)
+      document
+        .getElementById("reservation-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          console.log("Reserva simulada guardada!");
+          // Aquí iría la lógica real de guardar en la base de datos
+          closeModal();
+          // renderCalendar(); // En una app real, actualizaríamos la vista
+        });
+
+      // INICIO DE LA APLICACIÓN
+      window.onload = function () {
+        renderCalendar(today);
+      };
+    </script>
+  </body>
+</html>
