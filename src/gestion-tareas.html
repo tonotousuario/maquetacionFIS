@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayEasy - Housekeeping y Tareas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f7f9fb;
+      }
+      .card {
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+      }
+      .status-pill {
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-weight: 600;
+        font-size: 0.75rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="min-h-screen p-4 sm:p-8">
+      <!-- Encabezado y Título -->
+      <header
+        class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center"
+      >
+        <h1 class="text-3xl font-bold text-[#1e3a8a] flex items-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8 mr-3"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 2l6 4v10l-6 4-6-4V6z"></path>
+            <path d="M12 2v20"></path>
+            <path d="M18 6v10"></path>
+            <path d="M6 6v10"></path>
+            <path d="M12 6h6"></path>
+            <path d="M12 6H6"></path>
+          </svg>
+          Gestión de Housekeeping
+        </h1>
+        <button
+          class="mt-4 sm:mt-0 py-2 px-4 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition duration-200"
+        >
+          Ver Reporte de Limpieza
+        </button>
+      </header>
+
+      <!-- Filtros y Opciones -->
+      <div
+        class="mb-6 flex flex-wrap gap-4 items-center p-4 bg-white rounded-xl card"
+      >
+        <input
+          type="text"
+          placeholder="Buscar por Habitación o Responsable..."
+          class="flex-grow max-w-sm border border-gray-300 rounded-lg p-2 text-sm focus:ring-[#2563eb] focus:border-[#2563eb]"
+        />
+        <select class="border border-gray-300 rounded-lg p-2 text-sm">
+          <option>Estado: Todos</option>
+          <option>Sucia</option>
+          <option>Limpieza en Curso</option>
+          <option>Lista (Limpia)</option>
+        </select>
+        <select class="border border-gray-300 rounded-lg p-2 text-sm">
+          <option>Piso: Todos</option>
+          <option>Piso 1</option>
+          <option>Piso 2</option>
+          <option>Piso 3</option>
+        </select>
+      </div>
+
+      <!-- Vista de Tablero (Rooms Grid) -->
+      <div
+        id="rooms-grid"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+      >
+        <!-- Card: Habitación Sucia (Check-out reciente) -->
+        <div
+          class="room-card bg-white p-5 rounded-xl border-l-4 border-red-500 card hover:shadow-lg transition"
+        >
+          <div class="flex justify-between items-start">
+            <span class="text-2xl font-extrabold text-red-500">101</span>
+            <span class="status-pill bg-red-100 text-red-700">SUCIA</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Doble Estándar | Salida: Hoy</p>
+          <p class="text-sm font-semibold mt-3 mb-2">
+            Asignada a: <span class="text-gray-400">Sin asignar</span>
+          </p>
+          <button
+            onclick="assignTask('101')"
+            class="w-full py-1.5 text-xs bg-[#1e3a8a] text-white rounded-lg hover:bg-[#2563eb] transition"
+          >
+            Asignar Limpieza
+          </button>
+        </div>
+
+        <!-- Card: Habitación Limpieza en Curso -->
+        <div
+          class="room-card bg-white p-5 rounded-xl border-l-4 border-yellow-500 card hover:shadow-lg transition"
+        >
+          <div class="flex justify-between items-start">
+            <span class="text-2xl font-extrabold text-yellow-600">205</span>
+            <span class="status-pill bg-yellow-100 text-yellow-700"
+              >EN CURSO</span
+            >
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Suite Ejecutiva | Ocupada</p>
+          <p class="text-sm font-semibold mt-3 mb-2">
+            Asignada a: <span class="text-gray-800">Marta L.</span>
+          </p>
+          <button
+            onclick="changeStatus('205', 'Lista')"
+            class="w-full py-1.5 text-xs bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+          >
+            Marcar como Lista
+          </button>
+        </div>
+
+        <!-- Card: Habitación Lista (Limpia) -->
+        <div
+          class="room-card bg-white p-5 rounded-xl border-l-4 border-green-500 card hover:shadow-lg transition"
+        >
+          <div class="flex justify-between items-start">
+            <span class="text-2xl font-extrabold text-green-600">302</span>
+            <span class="status-pill bg-green-100 text-green-700">LISTA</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Doble Deluxe | Disponible</p>
+          <p class="text-sm font-semibold mt-3 mb-2">
+            Última Limpieza: <span class="text-gray-800">Juan P.</span>
+          </p>
+          <button
+            onclick="requestMaintenance('302')"
+            class="w-full py-1.5 text-xs bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition"
+          >
+            Reportar Mantenimiento
+          </button>
+        </div>
+
+        <!-- Card: Habitación En Mantenimiento -->
+        <div
+          class="room-card bg-white p-5 rounded-xl border-l-4 border-gray-500 card hover:shadow-lg transition"
+        >
+          <div class="flex justify-between items-start">
+            <span class="text-2xl font-extrabold text-gray-600">401</span>
+            <span class="status-pill bg-gray-200 text-gray-800"
+              >MANTENIMIENTO</span
+            >
+          </div>
+          <p class="text-xs text-gray-500 mt-1">
+            Master Suite | Fuera de Servicio
+          </p>
+          <p class="text-sm font-semibold mt-3 mb-2">
+            Descripción: <span class="text-gray-800">Fuga en baño</span>
+          </p>
+          <button
+            onclick="changeStatus('401', 'Sucia')"
+            class="w-full py-1.5 text-xs bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition"
+          >
+            Finalizar Mantenimiento
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Función para simular la asignación de tarea
+      function assignTask(roomNumber) {
+        alertMessage(
+          `Tarea de limpieza asignada para Habitación ${roomNumber}.`,
+          "info",
+        );
+      }
+
+      // Función para simular el cambio de estado
+      function changeStatus(roomNumber, newStatus) {
+        alertMessage(
+          `Habitación ${roomNumber} cambiada a estado: "${newStatus}".`,
+          "success",
+        );
+      }
+
+      // Función para simular el reporte de mantenimiento
+      function requestMaintenance(roomNumber) {
+        alertMessage(
+          `Reporte de Mantenimiento enviado para Habitación ${roomNumber}.`,
+          "error",
+        );
+      }
+
+      // Función para reemplazar el alert() nativo (Reutilizada del archivo anterior)
+      function alertMessage(message, type = "info") {
+        const container = document.body;
+        let messageBox = document.getElementById("custom-alert");
+
+        if (!messageBox) {
+          messageBox = document.createElement("div");
+          messageBox.id = "custom-alert";
+          messageBox.className =
+            "fixed top-0 right-0 m-4 p-4 rounded-lg shadow-lg text-white font-semibold transform translate-y-[-100%] transition-all duration-300 z-50";
+          container.appendChild(messageBox);
+        }
+
+        // Aplicar estilos según el tipo
+        let bgColor = "bg-blue-600";
+        if (type === "success") bgColor = "bg-green-600";
+        if (type === "error") bgColor = "bg-red-600";
+
+        messageBox.className = `fixed top-0 right-0 m-4 p-4 rounded-xl shadow-2xl text-white font-semibold transition-all duration-500 z-50 ${bgColor}`;
+        messageBox.textContent = message;
+
+        // Mostrar el mensaje
+        requestAnimationFrame(() => {
+          messageBox.style.transform = "translateY(0)";
+        });
+
+        // Ocultar después de 5 segundos
+        setTimeout(() => {
+          messageBox.style.transform = "translateY(-150%)";
+        }, 5000);
+      }
+    </script>
+  </body>
+</html>
