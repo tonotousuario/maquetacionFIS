@@ -4,25 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>StayEasy - Check-in Rápido</title>
-    <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      /* Fuente Inter y fondo suave */
       body {
         font-family: "Inter", sans-serif;
-        background-color: #f3f4f6; /* Fondo gris claro */
+        background-color: #f3f4f6;
       }
-      /* Color de acento de StayEasy (teal-600) */
       .accent-color {
         color: #0d9488;
       }
       .accent-bg {
         background-color: #0d9488;
       }
-      /* Estilo para campos de solo lectura */
       .readonly-field {
         background-color: #f9fafb;
-        border-left: 4px solid #bae6fd; /* Azul claro para diferenciar de campos activos */
+        border-left: 4px solid #bae6fd;
         color: #1f2937;
         font-weight: 500;
       }
@@ -31,7 +27,6 @@
   <body
     class="flex items-start justify-center min-h-screen p-4 sm:p-8 antialiased"
   >
-    <!-- Tarjeta Principal del Formulario -->
     <div class="w-full max-w-4xl">
       <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-10">
         <!-- Encabezado y Título -->
@@ -52,7 +47,6 @@
           </p>
         </div>
 
-        <!-- MOCK DATA: Simulación de datos de reserva cargados -->
         <script>
           const mockReservation = {
             guestName: "Ana María Torres",
@@ -231,7 +225,6 @@
       </div>
     </div>
 
-    <!-- LÓGICA JAVASCRIPT para habilitar el botón -->
     <script>
       const form = document.getElementById("checkin-form");
       const idVerification = document.getElementById("id-verification");
@@ -240,7 +233,6 @@
       const finalizeButton = document.getElementById("finalize-button");
 
       function checkFormValidity() {
-        // Habilita el botón solo si todos los campos requeridos están llenos y confirmados
         const isReady =
           idVerification.checked &&
           signatureConfirmed.checked &&
@@ -249,40 +241,32 @@
         finalizeButton.disabled = !isReady;
       }
 
-      // Añadir listeners para verificar el estado
       idVerification.addEventListener("change", checkFormValidity);
       signatureConfirmed.addEventListener("change", checkFormValidity);
       keyCardNumber.addEventListener("input", checkFormValidity);
 
-      // Manejo del formulario (solo simulación)
       form.addEventListener("submit", function (e) {
         e.preventDefault();
 
         if (finalizeButton.disabled) {
-          // Esto no debería suceder si la lógica es correcta, pero es una buena práctica
           console.warn("El formulario no está completo.");
           return;
         }
 
-        // Simulación de Check-in exitoso
         finalizeButton.textContent = "Check-in Exitoso!";
         finalizeButton.classList.remove("accent-bg", "hover:bg-teal-700");
         finalizeButton.classList.add("bg-green-600", "hover:bg-green-700");
 
-        // En una aplicación real, aquí se enviarían los datos y se redirigiría al resumen de factura.
         setTimeout(() => {
           alert("¡Check-in de Ana María Torres completado con éxito!");
-          // Resetear el estado de la UI para un nuevo check-in
           finalizeButton.textContent = "Finalizar Check-in y Abrir Factura";
           finalizeButton.classList.remove("bg-green-600", "hover:bg-green-700");
           finalizeButton.classList.add("accent-bg", "hover:bg-teal-700");
           form.reset();
           finalizeButton.disabled = true;
-          // Nota: Usé alert() solo para simular el mensaje final. En la práctica, se usaría un modal.
         }, 1000);
       });
 
-      // Ejecutar la verificación inicial
       window.onload = checkFormValidity;
     </script>
   </body>

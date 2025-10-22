@@ -321,7 +321,6 @@ Cliente de alto valor. Siempre solicita transfer aeropuerto.</textarea
     </div>
 
     <script>
-      // --- Lógica de Pestañas ---
       document.addEventListener("DOMContentLoaded", () => {
         const tabs = document.querySelectorAll(".tab-button");
         const contents = document.querySelectorAll(".tab-content");
@@ -330,20 +329,15 @@ Cliente de alto valor. Siempre solicita transfer aeropuerto.</textarea
           tab.addEventListener("click", () => {
             const targetId = tab.dataset.tab;
 
-            // Desactivar todas las pestañas
             tabs.forEach((t) => t.classList.remove("active"));
-            // Ocultar todo el contenido
             contents.forEach((c) => c.classList.add("hidden"));
 
-            // Activar la pestaña clickeada
             tab.classList.add("active");
-            // Mostrar el contenido objetivo
             document.getElementById(targetId).classList.remove("hidden");
           });
         });
       });
 
-      // --- Funciones de CRM (Perfil de Huésped) ---
       function searchGuest() {
         const searchTerm = document.getElementById("guest-search").value.trim();
         if (searchTerm) {
@@ -351,13 +345,11 @@ Cliente de alto valor. Siempre solicita transfer aeropuerto.</textarea
             `Buscando huésped para el término: "${searchTerm}"...`,
             "info",
           );
-          // En un sistema real, aquí se cargaría el perfil de Sofía Fernández
         } else {
           alertMessage("Por favor, ingrese un término de búsqueda.", "error");
         }
       }
 
-      // --- Funciones de Configuración ---
       function addRoomType() {
         alertMessage(
           "Mostrando modal para agregar un nuevo tipo de habitación.",
@@ -374,7 +366,6 @@ Cliente de alto valor. Siempre solicita transfer aeropuerto.</textarea
         );
       }
 
-      // --- Función para reemplazar el alert() nativo (Reutilizada) ---
       function alertMessage(message, type = "info") {
         const container = document.body;
         let messageBox = document.getElementById("custom-alert");
@@ -387,7 +378,6 @@ Cliente de alto valor. Siempre solicita transfer aeropuerto.</textarea
           container.appendChild(messageBox);
         }
 
-        // Aplicar estilos según el tipo
         let bgColor = "bg-blue-600";
         if (type === "success") bgColor = "bg-green-600";
         if (type === "error") bgColor = "bg-red-600";
@@ -396,12 +386,10 @@ Cliente de alto valor. Siempre solicita transfer aeropuerto.</textarea
         messageBox.className = `fixed top-0 right-0 m-4 p-4 rounded-xl shadow-2xl text-white font-semibold transition-all duration-500 z-50 ${bgColor}`;
         messageBox.textContent = message;
 
-        // Mostrar el mensaje
         requestAnimationFrame(() => {
           messageBox.style.transform = "translateY(0)";
         });
 
-        // Ocultar después de 5 segundos
         setTimeout(() => {
           messageBox.style.transform = "translateY(-150%)";
         }, 5000);

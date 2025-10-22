@@ -4,15 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>StayEasy - Reservaciones</title>
-    <!-- Carga de Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      /* Fuente Inter y fondo suave */
       body {
         font-family: "Inter", sans-serif;
         background-color: #f7f7f7;
       }
-      /* Color de acento de StayEasy (teal-600) */
       .accent-color {
         color: #0d9488;
       }
@@ -20,31 +17,29 @@
         background-color: #0d9488;
       }
 
-      /* Estilos específicos del planificador */
       #reservations-grid {
-        /* Permite el scroll horizontal si la tabla es más ancha */
         overflow-x: auto;
         max-width: 100%;
         border-radius: 0.75rem;
       }
       .room-row {
         display: flex;
-        min-height: 3rem; /* Altura de la fila */
+        min-height: 3rem;
       }
       .room-header {
-        min-width: 6rem; /* Ancho fijo para el nombre de la habitación */
+        min-width: 6rem;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 600;
-        position: sticky; /* Fija la columna de la habitación para el scroll */
+        position: sticky;
         left: 0;
         z-index: 10;
-        background-color: #f3f4f6; /* Fondo distinto para la cabecera */
+        background-color: #f3f4f6;
         border-right: 1px solid #e5e7eb;
       }
       .date-cell {
-        min-width: 6rem; /* Ancho de la celda de fecha */
+        min-width: 6rem;
         flex-grow: 1;
         border-right: 1px solid #e5e7eb;
         border-bottom: 1px solid #e5e7eb;
@@ -54,39 +49,37 @@
         position: relative;
       }
       .date-cell:hover {
-        background-color: #e5e7eb; /* Gris claro al pasar el ratón */
-        z-index: 5; /* Asegura que el hover se vea sobre otras celdas */
+        background-color: #e5e7eb;
+        z-index: 5;
       }
       .today-header {
-        background-color: #f0fdf4; /* Fondo verde claro para hoy */
-        color: #15803d; /* Texto verde oscuro */
+        background-color: #f0fdf4;
+        color: #15803d;
         border-bottom: 2px solid #10b981;
       }
       .today-cell {
-        background-color: #f0fdf4 !important; /* Resaltar la celda de hoy */
+        background-color: #f0fdf4 !important;
       }
 
-      /* Estilos para barras de reserva */
       .reservation-bar {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         height: 80%;
-        border-radius: 0.375rem; /* rounded-md */
+        border-radius: 0.375rem;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         color: white;
         font-size: 0.75rem;
         display: flex;
         align-items: center;
         padding: 0 0.5rem;
-        z-index: 10; /* Asegura que esté sobre el fondo de la celda */
+        z-index: 10;
         overflow: hidden;
         white-space: nowrap;
       }
     </style>
   </head>
   <body class="antialiased">
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR (Reutilizando la estructura del Dashboard) -->
     <header class="bg-white shadow-sm sticky top-0 z-20">
       <div
         class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center"
@@ -246,15 +239,12 @@
       </div>
     </div>
 
-    <!-- LÓGICA JAVASCRIPT -->
     <script>
-      // CONFIGURACIÓN Y MOCK DATA
       const calendarContainer = document.getElementById("calendar-container");
       const modal = document.getElementById("reservation-modal");
       const selectedDateInfo = document.getElementById("selected-date-info");
       const currentPeriodSpan = document.getElementById("current-period");
 
-      // Datos de Mock (Habitaciones)
       const MOCK_ROOMS = [
         { id: "101", name: "101 - Doble" },
         { id: "102", name: "102 - Doble" },
@@ -268,7 +258,6 @@
         { id: "502", name: "502 - King" },
       ];
 
-      // Definición de Estados y Colores
       const STATUS_MAP = {
         RESERVADA: { color: "bg-blue-500", text: "Res." },
         CHECKED_IN: { color: "bg-teal-600", text: "In" },
@@ -277,7 +266,6 @@
         TENTATIVA: { color: "bg-purple-400", text: "Ten." },
       };
 
-      // Mock de Reservaciones (Fechas relativas para la demostración)
       const today = new Date();
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
@@ -319,7 +307,6 @@
         },
       ];
 
-      // UTILIDADES DE FECHA
       const dateFormatter = new Intl.DateTimeFormat("es-MX", {
         weekday: "short",
         month: "short",
@@ -331,8 +318,8 @@
 
       function getStartOfWeek(date) {
         const d = new Date(date);
-        const day = d.getDay(); // 0 (Domingo) - 6 (Sábado)
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Ajusta para empezar en Lunes (1)
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
         const startOfWeek = new Date(d.setDate(diff));
         startOfWeek.setHours(0, 0, 0, 0);
         return startOfWeek;
@@ -348,7 +335,6 @@
         );
       }
 
-      // CÁLCULO DE RESERVAS
       function calculateReservationPosition(
         startDate,
         endDate,
@@ -360,21 +346,18 @@
         const calStart = calendarStart.setHours(0, 0, 0, 0);
         const calEnd = calendarEnd.setHours(0, 0, 0, 0);
 
-        // Determinar si la reserva está dentro del rango visible
         if (end <= calStart || start >= calEnd) {
           return null;
         }
 
-        // Calcular el número total de días en la vista (7 días)
         const totalDays = 7;
         const msInDay = 24 * 60 * 60 * 1000;
 
-        // Días que la reserva dura dentro de la vista
         const visibleStart = new Date(Math.max(start, calStart));
-        const visibleEnd = new Date(Math.min(end, calEnd - msInDay)); // Excluye el día de salida (check-out)
+        const visibleEnd = new Date(Math.min(end, calEnd - msInDay));
 
         const startDayIndex = (visibleStart - calStart) / msInDay;
-        const visibleDuration = (visibleEnd - visibleStart) / msInDay + 1; // +1 porque es inclusivo
+        const visibleDuration = (visibleEnd - visibleStart) / msInDay + 1;
 
         const left = (startDayIndex / totalDays) * 100;
         const width = (visibleDuration / totalDays) * 100;
@@ -382,14 +365,12 @@
         return { left: `${left}%`, width: `${width}%` };
       }
 
-      // FUNCIÓN PRINCIPAL DE RENDERIZADO
       function renderCalendar(referenceDate = new Date()) {
         calendarContainer.innerHTML = "";
 
-        // 1. Definir el rango semanal (Lunes a Domingo)
         const weekStart = getStartOfWeek(referenceDate);
         const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekStart.getDate() + 7); // Excluye el octavo día
+        weekEnd.setDate(weekStart.getDate() + 7);
 
         const days = [];
         let currentDay = new Date(weekStart);
@@ -398,14 +379,12 @@
           currentDay.setDate(currentDay.getDate() + 1);
         }
 
-        // Actualizar el periodo mostrado
         const monthFormatter = new Intl.DateTimeFormat("es-MX", {
           month: "long",
           year: "numeric",
         });
         currentPeriodSpan.textContent = `${dayOnlyFormatter.format(weekStart)} - ${dayOnlyFormatter.format(new Date(weekEnd.getTime() - 24 * 60 * 60 * 1000))} de ${monthFormatter.format(weekStart)}`;
 
-        // 2. Crear la fila de cabecera de las fechas
         let headerRowHTML =
           '<div class="room-row bg-white font-semibold text-gray-700 border-b">';
         headerRowHTML +=
@@ -426,20 +405,16 @@
         headerRowHTML += "</div>";
         calendarContainer.innerHTML += headerRowHTML;
 
-        // 3. Crear las filas de habitaciones
         MOCK_ROOMS.forEach((room) => {
           let roomRowHTML = `<div class="room-row relative">`;
 
-          // Cabecera de la Habitación
           roomRowHTML += `<div class="room-header text-sm text-gray-800">${room.name}</div>`;
 
-          // Celdas de Fecha
           days.forEach((day) => {
             const dayYMD = dateToYMD(day);
             const isToday = dayYMD === todayYMD;
             const cellClass = isToday ? "today-cell" : "bg-white";
 
-            // Atributos de datos para el clic
             roomRowHTML += `<div 
                         class="date-cell ${cellClass}" 
                         data-room-id="${room.id}" 
@@ -448,10 +423,9 @@
                     ></div>`;
           });
 
-          roomRowHTML += "</div>"; // Fin de room-row
+          roomRowHTML += "</div>";
           calendarContainer.innerHTML += roomRowHTML;
 
-          // 4. Agregar barras de reserva
           MOCK_RESERVATIONS.filter((res) => res.room_id === room.id).forEach(
             (res) => {
               const pos = calculateReservationPosition(
@@ -471,7 +445,6 @@
                 reservationBar.innerHTML = `<span class="truncate">${statusData.text}: ${res.guest}</span>`;
                 reservationBar.title = `Reserva de ${res.guest} (${res.status})`;
 
-                // Añadir la barra a la fila
                 rowElement.appendChild(reservationBar);
               }
             },
@@ -479,12 +452,10 @@
         });
       }
 
-      // Funciones del Modal
       function openModal(roomName, formattedDate) {
         selectedDateInfo.textContent = `Creando reserva en: ${roomName} | Fecha Seleccionada: ${formattedDate}`;
-        // Pre-rellenar el check-in del formulario con la fecha seleccionada
-        const dateParts = formattedDate.split(" ")[2].split("/"); // Ejemplo: "lun, 25/sep"
-        const year = today.getFullYear(); // Usar el año actual para la maqueta
+        const dateParts = formattedDate.split(" ")[2].split("/");
+        const year = today.getFullYear();
         const yyyyMmDd = `${year}-${dateParts[1].padStart(2, "0")}-${dateParts[0].padStart(2, "0")}`;
         document.getElementById("check-in").value = yyyyMmDd;
 
@@ -492,7 +463,6 @@
       }
 
       function closeModal(event) {
-        // Cierra el modal solo si el clic fue en el fondo o en el botón de cerrar
         if (
           !event ||
           event.target === modal ||
@@ -500,23 +470,18 @@
           event.target.textContent === "×"
         ) {
           modal.classList.add("hidden");
-          // Opcional: limpiar el formulario
           document.getElementById("reservation-form").reset();
         }
       }
 
-      // Manejo del formulario (solo mock)
       document
         .getElementById("reservation-form")
         .addEventListener("submit", function (e) {
           e.preventDefault();
           console.log("Reserva simulada guardada!");
-          // Aquí iría la lógica real de guardar en la base de datos
           closeModal();
-          // renderCalendar(); // En una app real, actualizaríamos la vista
         });
 
-      // INICIO DE LA APLICACIÓN
       window.onload = function () {
         renderCalendar(today);
       };

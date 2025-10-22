@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>StayEasy - Dashboard de Reportes</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Incluir D3.js para visualización de datos -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
@@ -187,7 +186,6 @@
     </div>
 
     <script>
-      // Datos de ejemplo para los gráficos
       const occupancyData = [
         { month: "Ene", value: 65 },
         { month: "Feb", value: 70 },
@@ -208,7 +206,6 @@
         { roomType: "Master Suite", revenue: 200000, color: "#8b5cf6" },
       ];
 
-      // Función para renderizar el Gráfico de Ocupación (Línea)
       function renderOccupancyChart() {
         const container = d3.select("#occupancy-chart");
         const margin = { top: 20, right: 30, bottom: 40, left: 40 };
@@ -218,7 +215,7 @@
           margin.right;
         const height = 300 - margin.top - margin.bottom;
 
-        container.html(""); // Limpiar si existe
+        container.html("");
 
         const svg = container
           .append("svg")
@@ -235,16 +232,13 @@
 
         const y = d3.scaleLinear().domain([0, 100]).range([height, 0]);
 
-        // Eje X
         svg
           .append("g")
           .attr("transform", `translate(0,${height})`)
           .call(d3.axisBottom(x));
 
-        // Eje Y (con ticks al 100%)
         svg.append("g").call(d3.axisLeft(y).tickFormat((d) => d + "%"));
 
-        // Línea de Ocupación
         const line = d3
           .line()
           .x((d) => x(d.month) + x.bandwidth() / 2)
@@ -259,7 +253,6 @@
           .attr("stroke-width", 3)
           .attr("d", line);
 
-        // Puntos
         svg
           .selectAll(".dot")
           .data(occupancyData)
@@ -272,7 +265,6 @@
           .attr("fill", "#2563eb");
       }
 
-      // Función para renderizar el Gráfico de Ingresos (Barras)
       function renderRevenueChart() {
         const container = d3.select("#revenue-chart");
         const margin = { top: 20, right: 30, bottom: 40, left: 60 };
@@ -282,7 +274,7 @@
           margin.right;
         const height = 300 - margin.top - margin.bottom;
 
-        container.html(""); // Limpiar si existe
+        container.html("");
 
         const svg = container
           .append("svg")
@@ -302,7 +294,6 @@
           .domain([0, d3.max(revenueData, (d) => d.revenue)])
           .range([height, 0]);
 
-        // Eje X
         svg
           .append("g")
           .attr("transform", `translate(0,${height})`)
@@ -310,12 +301,10 @@
           .selectAll("text")
           .attr("font-size", "10px");
 
-        // Eje Y (Formato de moneda)
         svg
           .append("g")
           .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format("~s")));
 
-        // Barras
         svg
           .selectAll(".bar")
           .data(revenueData)
@@ -327,11 +316,10 @@
           .attr("width", x.bandwidth())
           .attr("height", (d) => height - y(d.revenue))
           .attr("fill", (d) => d.color)
-          .attr("rx", 4) // Bordes redondeados
+          .attr("rx", 4)
           .attr("ry", 4);
       }
 
-      // Inicializar y hacer responsivo
       function initCharts() {
         renderOccupancyChart();
         renderRevenueChart();

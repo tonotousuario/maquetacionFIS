@@ -27,7 +27,6 @@
   </head>
   <body>
     <div class="min-h-screen p-4 sm:p-8">
-      <!-- Encabezado y Título -->
       <header
         class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center"
       >
@@ -175,7 +174,6 @@
     </div>
 
     <script>
-      // Función para simular la asignación de tarea
       function assignTask(roomNumber) {
         alertMessage(
           `Tarea de limpieza asignada para Habitación ${roomNumber}.`,
@@ -183,7 +181,6 @@
         );
       }
 
-      // Función para simular el cambio de estado
       function changeStatus(roomNumber, newStatus) {
         alertMessage(
           `Habitación ${roomNumber} cambiada a estado: "${newStatus}".`,
@@ -191,7 +188,6 @@
         );
       }
 
-      // Función para simular el reporte de mantenimiento
       function requestMaintenance(roomNumber) {
         alertMessage(
           `Reporte de Mantenimiento enviado para Habitación ${roomNumber}.`,
@@ -199,7 +195,6 @@
         );
       }
 
-      // Función para reemplazar el alert() nativo (Reutilizada del archivo anterior)
       function alertMessage(message, type = "info") {
         const container = document.body;
         let messageBox = document.getElementById("custom-alert");
@@ -212,7 +207,6 @@
           container.appendChild(messageBox);
         }
 
-        // Aplicar estilos según el tipo
         let bgColor = "bg-blue-600";
         if (type === "success") bgColor = "bg-green-600";
         if (type === "error") bgColor = "bg-red-600";
@@ -220,12 +214,10 @@
         messageBox.className = `fixed top-0 right-0 m-4 p-4 rounded-xl shadow-2xl text-white font-semibold transition-all duration-500 z-50 ${bgColor}`;
         messageBox.textContent = message;
 
-        // Mostrar el mensaje
         requestAnimationFrame(() => {
           messageBox.style.transform = "translateY(0)";
         });
 
-        // Ocultar después de 5 segundos
         setTimeout(() => {
           messageBox.style.transform = "translateY(-150%)";
         }, 5000);

@@ -23,7 +23,6 @@
   </head>
   <body>
     <div class="min-h-screen p-4 sm:p-8">
-      <!-- Encabezado y Navegación Simple -->
       <header class="mb-8">
         <h1 class="text-3xl font-bold text-[#1e3a8a] flex items-center">
           <svg
@@ -217,7 +216,6 @@
     </div>
 
     <script>
-      // JS para simular la acción de Check-out
       document
         .getElementById("process-payment")
         .addEventListener("click", () => {
@@ -229,7 +227,6 @@
           );
         });
 
-      // Función para reemplazar el alert() nativo
       function alertMessage(message, type = "info") {
         const container = document.body;
         let messageBox = document.getElementById("custom-alert");
@@ -242,7 +239,6 @@
           container.appendChild(messageBox);
         }
 
-        // Aplicar estilos según el tipo
         let bgColor = "bg-blue-600";
         if (type === "success") bgColor = "bg-green-600";
         if (type === "error") bgColor = "bg-red-600";
@@ -250,12 +246,10 @@
         messageBox.className = `fixed top-0 right-0 m-4 p-4 rounded-xl shadow-2xl text-white font-semibold transition-all duration-500 z-50 ${bgColor}`;
         messageBox.textContent = message;
 
-        // Mostrar el mensaje
         requestAnimationFrame(() => {
           messageBox.style.transform = "translateY(0)";
         });
 
-        // Ocultar después de 5 segundos
         setTimeout(() => {
           messageBox.style.transform = "translateY(-150%)";
         }, 5000);
